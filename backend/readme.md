@@ -63,7 +63,7 @@ Antes de começar, você precisará ter os seguintes softwares instalados em sua
 Para clonar o repositório do projeto, execute o seguinte comando no terminal:
 
 ```bash
-git clone https://github.com/RafaelJaber/DsCommerce.git
+git clone https://github.com/RafaelJaber/DsCommerce_Rest-Assured.git
 ```
 
 <h3>Iniciando o Projeto</h3>
