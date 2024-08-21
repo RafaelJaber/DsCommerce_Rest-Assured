@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.*;
 
 import com.devsuperior.dscommerce.restassured.tests.TokenUtil;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import net.datafaker.Faker;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +68,7 @@ public class ProductControllerRA {
     @Test
     public void findByIdShouldReturnProductWhenIdExists() {
         existingProductId = 2L;
+        nonExistingProductId = 999L;
 
         given()
             .get("/products/" + existingProductId)
@@ -226,5 +229,73 @@ public class ProductControllerRA {
                 .post("/products")
                 .then()
                 .statusCode(401);
+    }
+
+    @Test
+    public void deleteShouldReturnNoContentWhenAdminLoggedAndExistingProductId() {
+        existingProductId = createProduct();
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/" + existingProductId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenAdminLoggedAndNonExistingProductId() {
+        nonExistingProductId = 999L;
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/" + nonExistingProductId)
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void deleteShouldReturnForbiddenClientLoggedAndExistingProductId() {
+        existingProductId = createProduct();
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + clientToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/" + existingProductId)
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    public void deleteShouldReturnBadRequestAdminLoggedAndDependentProductId() {
+        long dependentProductId = 3L;
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/" + dependentProductId)
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("Referential integrity failure"));
+    }
+
+    private Long createProduct() {
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        Response response = given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + adminToken)
+            .body(newProduct)
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .when()
+            .post("/products");
+        JsonPath jsonBody = response.jsonPath();
+        String productId = jsonBody.getString("id");
+        return Long.parseLong(productId);
     }
 }
