@@ -12,11 +12,13 @@ import static org.hamcrest.Matchers.*;
 public class ProductControllerRA {
 
     private Long existingProductId, nonExistingProductId;
+    private String productName;
 
     @BeforeEach
     public void setUp() {
         baseURI = "http://localhost:8080";
 
+        productName = "Macbook Pro";
     }
 
     @Test
@@ -32,5 +34,32 @@ public class ProductControllerRA {
             .body("price", is(2190.0F))
             .body("categories.id", hasItems(2, 3))
             .body("categories.name", hasItems("Eletrônicos", "Computadores"));
+    }
+
+    @Test
+    public void findAllShouldReturnPageProductsWhenNameIsEmpty() {
+        given()
+            .get("/products?page=0")
+        .then()
+            .statusCode(200)
+                .body("content.name", hasItems("Macbook Pro", "PC Gamer Tera"));
+    }
+
+    @Test
+    public void findAllShouldReturnPageProductsWhenNameIsNotEmpty() {
+        given()
+            .get("/products?name={productName}", productName)
+        .then()
+            .statusCode(200)
+            .body("content.name", hasItem(productName));
+    }
+
+    @Test
+    public void findAllShouldReturnPagedProductsWithPriceGreaterThan2000() {
+        given()
+            .get("/products?size=25")
+        .then()
+            .statusCode(200)
+            .body("content.findAll { it.price > 2000 }.name", hasItems("Smart TV", "PC Gamer Max"));
     }
 }
