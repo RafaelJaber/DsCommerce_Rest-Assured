@@ -123,4 +123,78 @@ public class ProductControllerRA {
             .body("imageUrl", equalTo(postProductInstance.get("imageUrl")))
             .body("categories.id", hasItems(2, 3));
     }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndInvalidName() {
+        postProductInstance.put("name", "ab");
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(422)
+                .body("errors.fieldName", hasItem("name"))
+                .body("errors.message", hasItem("Name must be 3 to 80 characters long"));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndPriceIsNegative() {
+        Double price = Double.parseDouble(faker.commerce().price(500.0, 20000.50)) * -1;
+        postProductInstance.put("price", price);
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(422)
+                .body("errors.fieldName", hasItem("price"))
+                .body("errors.message", hasItem("The price must be positive"));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndPriceIsZero() {
+        Double price = 0.0;
+        postProductInstance.put("price", price);
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(422)
+                .body("errors.fieldName", hasItem("price"))
+                .body("errors.message", hasItem("The price must be positive"));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenAdminLoggedAndProductHasNoCategory() {
+        postProductInstance.put("categories", null);
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(422)
+                .body("errors.fieldName", hasItem("categories"))
+                .body("errors.message", hasItem("Must have minimum one category"));
+    }
 }
