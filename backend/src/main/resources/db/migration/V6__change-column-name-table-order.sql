@@ -1,0 +1,11 @@
+ALTER TABLE tb_order
+    DROP CONSTRAINT FK_TB_ORDER_ON_USER
+GO
+
+ALTER TABLE tb_order
+    ADD client_id bigint
+GO
+
+ALTER TABLE tb_order
+    ADD CONSTRAINT FK_TB_ORDER_ON_CLIENT FOREIGN KEY (client_id) REFERENCES tb_user (id)
+GO

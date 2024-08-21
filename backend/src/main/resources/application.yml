@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: DsCommerce
+  jackson:
+    time-zone: UTC
+  profiles:
+    active: ${APP_PROFILE:test}
+dscommerce:
+  security:
+    client-id: ${CLIENT_ID:myclientid}
+    client-secret: ${CLIENT_SECRET:myclientsecret}
+    jwt:
+      duration: ${JWT_DURATION:86400}
+  cors:
+    origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}

@@ -1,0 +1,10 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    cap_add: [ 'SYS_PTRACE' ]
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_SA_PASSWORD=Senha*01#"
+    ports:
+      - "1433:1433"
+    hostname: planner-db
