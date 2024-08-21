@@ -197,4 +197,34 @@ public class ProductControllerRA {
                 .body("errors.fieldName", hasItem("categories"))
                 .body("errors.message", hasItem("Must have minimum one category"));
     }
+
+    @Test
+    public void insertShouldReturnForbiddenWhenClientLogged() {
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + clientToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    public void insertShouldReturnUnauthorizedWhenInvalidToken() {
+        JSONObject newProduct = new JSONObject(postProductInstance);
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + invalidToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(401);
+    }
 }
