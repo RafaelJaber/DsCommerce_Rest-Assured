@@ -1,9 +1,5 @@
 package com.devsuperior.dscommerce.restassured.controllers;
 
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
-
 import com.devsuperior.dscommerce.restassured.tests.TokenUtil;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -19,9 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
 
 @Tag("RA")
-public class ProductControllerRA {
+public class ProductControllerRATest {
 
 
     Faker faker = new Faker();
@@ -71,60 +71,60 @@ public class ProductControllerRA {
         nonExistingProductId = 999L;
 
         given()
-            .get("/products/" + existingProductId)
-        .then()
-            .statusCode(200)
-            .body("id", is(existingProductId.intValue()))
-            .body("name", equalTo("Smart TV"))
-            .body("price", is(2190.0F))
-            .body("categories.id", hasItems(2, 3))
-            .body("categories.name", hasItems("Eletrônicos", "Computadores"));
+                .get("/products/" + existingProductId)
+                .then()
+                .statusCode(200)
+                .body("id", is(existingProductId.intValue()))
+                .body("name", equalTo("Smart TV"))
+                .body("price", is(2190.0F))
+                .body("categories.id", hasItems(2, 3))
+                .body("categories.name", hasItems("Eletrônicos", "Computadores"));
     }
 
     @Test
     public void findAllShouldReturnPageProductsWhenNameIsEmpty() {
         given()
-            .get("/products?page=0")
-        .then()
-            .statusCode(200)
+                .get("/products?page=0")
+                .then()
+                .statusCode(200)
                 .body("content.name", hasItems("Macbook Pro", "PC Gamer Tera"));
     }
 
     @Test
     public void findAllShouldReturnPageProductsWhenNameIsNotEmpty() {
         given()
-            .get("/products?name={productName}", productName)
-        .then()
-            .statusCode(200)
-            .body("content.name", hasItem(productName));
+                .get("/products?name={productName}", productName)
+                .then()
+                .statusCode(200)
+                .body("content.name", hasItem(productName));
     }
 
     @Test
     public void findAllShouldReturnPagedProductsWithPriceGreaterThan2000() {
         given()
-            .get("/products?size=25")
-        .then()
-            .statusCode(200)
-            .body("content.findAll { it.price > 2000 }.name", hasItems("Smart TV", "PC Gamer Max"));
+                .get("/products?size=25")
+                .then()
+                .statusCode(200)
+                .body("content.findAll { it.price > 2000 }.name", hasItems("Smart TV", "PC Gamer Max"));
     }
 
     @Test
     public void insertShouldReturnProductCreatedWhenAdminLogged() {
         JSONObject newProduct = new JSONObject(postProductInstance);
         given()
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + adminToken)
-            .body(newProduct)
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-        .when()
-            .post("/products")
-        .then()
-            .statusCode(201)
-            .body("name", equalTo(postProductInstance.get("name")))
-            .body("price", is(Float.parseFloat(postProductInstance.get("price").toString())))
-            .body("imageUrl", equalTo(postProductInstance.get("imageUrl")))
-            .body("categories.id", hasItems(2, 3));
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(201)
+                .body("name", equalTo(postProductInstance.get("name")))
+                .body("price", is(Float.parseFloat(postProductInstance.get("price").toString())))
+                .body("imageUrl", equalTo(postProductInstance.get("imageUrl")))
+                .body("categories.id", hasItems(2, 3));
     }
 
     @Test
@@ -287,13 +287,13 @@ public class ProductControllerRA {
     private Long createProduct() {
         JSONObject newProduct = new JSONObject(postProductInstance);
         Response response = given()
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + adminToken)
-            .body(newProduct)
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .when()
-            .post("/products");
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/products");
         JsonPath jsonBody = response.jsonPath();
         String productId = jsonBody.getString("id");
         return Long.parseLong(productId);

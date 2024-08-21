@@ -43,7 +43,9 @@ Este projeto utiliza as seguintes tecnologias e frameworks:
 - **Flyway**: Ferramenta de versionamento e migração de banco de dados.
 - **Microsoft SQL Server**: Banco de dados relacional utilizado na aplicação.
 - **Docker**: Ferramenta para criação e gerenciamento de containers.
-- **Swagger**: Ferramenta para documentação e teste de APIs.
+- **Junit**: Framework de testes unitários para Java, utilizado para garantir a qualidade e a correção do código.
+- **JaCoCo**: Ferramenta para medição da cobertura de testes, ajudando a avaliar o quanto do código foi efetivamente testado.
+- **Rest Assured**: Biblioteca Java para simplificar a validação de serviços RESTful, permitindo escrever testes de API de maneira concisa e legível.
 
 <h2 id="started">🚀 Getting started</h2>
 
@@ -69,14 +71,9 @@ git clone https://github.com/RafaelJaber/DsCommerce.git
 Navegue até o diretório do projeto e suba os containers Docker:
 
 ```bash
-cd dscommerce
+cd dscommerce/backend
 docker-compose up -d
 ```
-
-<h3>Carregando o Banco de Dados</h3>
-
-Localize o arquivo de seed na pasta: 'src/main/resources/db/seed.sql'.
-Execute os scripts de insert no banco de dados para popular as tabelas iniciais.
 
 <h3>Rodando a Aplicação</h3>
 
@@ -87,7 +84,7 @@ Para iniciar a aplicação, você pode utilizar uma IDE ou seguir os passos abai
 ```
 
 ```bash
-java -jar target/dscommerce-0.0.1-SNAPSHOT.jar
+java -jar backend/target/dscommerce-0.0.1-SNAPSHOT.jar
 ```
 
 <h2 id="routes">📍 Endpoints da API</h2>
